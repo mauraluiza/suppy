@@ -18,7 +18,7 @@ const MOCK_TASKS: Partial<Task>[] = [
 ];
 
 const MOCK_NOTES: Partial<Note>[] = [
-    { id: '1', title: 'Senhas Padrão', content: 'Winfood: 121012, Cplug: 121412', is_favorite: true, created_at: new Date().toISOString() },
+    { id: '1', title: 'Senhas Padrão', content: 'Winfood: ******, Cplug: ******', is_favorite: true, created_at: new Date().toISOString() },
     { id: '2', title: 'Link Anydesk', content: 'Versão 7.1 recomendada', is_favorite: false, created_at: new Date().toISOString() },
 ];
 

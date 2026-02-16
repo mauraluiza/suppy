@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock, Mail, Loader2 } from 'lucide-react';
+import { AppLogo } from '../components/ui/app-logo';
 
 export function Login() {
     const [email, setEmail] = useState('');
@@ -31,13 +32,8 @@ export function Login() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
             <div className="w-full max-w-md space-y-8 bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700/50">
-                <div className="text-center">
-                    <div className="mx-auto h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-900/20">
-                        <Lock className="text-white h-6 w-6" />
-                    </div>
-                    <h2 className="mt-2 text-3xl font-extrabold text-white tracking-tight">
-                        Suppy Admin
-                    </h2>
+                <div className="flex flex-col items-center justify-center">
+                    <AppLogo size="lg" className="mb-4 text-white" />
                     <p className="mt-2 text-sm text-gray-400">
                         Entre com suas credenciais de acesso
                     </p>
@@ -105,7 +101,7 @@ export function Login() {
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

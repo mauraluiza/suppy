@@ -1,5 +1,6 @@
 
 import { NavLink, useNavigate } from 'react-router-dom';
+import { AppLogo } from "../ui/app-logo";
 import { LayoutDashboard, Users, CheckSquare, StickyNote, LogOut, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import clsx from 'clsx';
@@ -44,13 +45,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 )}
             >
                 <div className="flex items-center justify-between p-6 border-b border-border">
-                    <div className="flex items-center space-x-3">
-                        {/* Logo Placeholder if image fails, but designed for image */}
-                        <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold shadow-sm">
-                            S
-                        </div>
-                        <span className="text-xl font-bold text-foreground tracking-tight">Suppy</span>
-                    </div>
+                    <AppLogo />
                     <button
                         onClick={onClose}
                         className="md:hidden text-muted-foreground hover:text-foreground"
