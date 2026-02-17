@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Lock, Mail, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { AppLogo } from '../components/ui/app-logo';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Card, CardHeader, CardContent, CardDescription, CardTitle } from '../components/ui/card';
 
 export function Login() {
     const [email, setEmail] = useState('');
@@ -30,78 +33,69 @@ export function Login() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
-            <div className="w-full max-w-md space-y-8 bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700/50">
-                <div className="flex flex-col items-center justify-center">
-                    <AppLogo size="lg" className="mb-4 text-white" />
-                    <p className="mt-2 text-sm text-gray-400">
-                        Entre com suas credenciais de acesso
-                    </p>
-                </div>
-
-                <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-                    <div className="rounded-md shadow-sm space-y-4">
-                        <div>
-                            <label htmlFor="email-address" className="sr-only">Endereço de Email</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-500" />
-                                </div>
-                                <input
-                                    id="email-address"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors"
-                                    placeholder="Email de acesso"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="sr-only">Senha</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-gray-500" />
-                                </div>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors"
-                                    placeholder="Senha"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                            </div>
-                        </div>
+        <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
+            <Card className="w-full max-w-sm shadow-lg border-border/60">
+                <CardHeader className="space-y-1 text-center pb-6 pt-8">
+                    <div className="flex justify-center mb-6">
+                        <AppLogo size="lg" />
                     </div>
-
-                    {error && (
-                        <div className="bg-red-900/30 border border-red-800 text-red-200 px-4 py-3 rounded relative text-sm" role="alert">
-                            <span className="block sm:inline">{error}</span>
+                    <CardTitle className="text-2xl font-bold tracking-tight">Bem-vindo</CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Entre com suas credenciais para acessar o sistema
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <div className="space-y-2">
+                            <label 
+                                htmlFor="email" 
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                Email
+                            </label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="nome@exemplo.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                autoFocus
+                                className="bg-background"
+                            />
                         </div>
-                    )}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <label 
+                                    htmlFor="password" 
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    Senha
+                                </label>
+                            </div>
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className="bg-background"
+                            />
+                        </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-blue-900/30"
-                        >
-                            {loading ? (
-                                <Loader2 className="animate-spin h-5 w-5 text-white" />
-                            ) : (
-                                "Entrar no Sistema"
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div >
-        </div >
+                        {error && (
+                            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-900 dark:text-red-400 font-medium flex items-center justify-center">
+                                {error}
+                            </div>
+                        )}
+
+                        <Button className="w-full mt-2 font-semibold shadow-sm" type="submit" disabled={loading}>
+                            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Entrar no Sistema"}
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
+        </div>
     );
 }
