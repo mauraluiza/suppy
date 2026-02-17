@@ -3,6 +3,7 @@ import { supabase } from '../services/supabaseClient';
 import type { Task } from '../types';
 import { CheckSquare, Plus } from 'lucide-react';
 import { TaskCard } from '../components/Tasks/TaskCard';
+import { TaskModal } from '../components/Tasks/TaskModal';
 import { Button } from '../components/ui/button';
 import { PageContainer } from '../components/Layout/Page/PageContainer';
 import { PageHeader } from '../components/Layout/Page/PageHeader';
@@ -13,6 +14,10 @@ export function Tasks() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
 
     const fetchTasks = async () => {
         setLoading(true);
@@ -34,11 +39,13 @@ export function Tasks() {
             console.error('Erro ao buscar tarefas:', error);
         } else {
             // Sort frontend by priority: Urgent > In Progress > Pending > Done
+            // But also consider date within same priority? For now just priority.
             const priorityMap = { urgent: 1, in_progress: 2, pending: 3, done: 4 };
             const sorted = (data || []).sort((a: any, b: any) => {
                 const pA = priorityMap[a.status as keyof typeof priorityMap] || 99;
                 const pB = priorityMap[b.status as keyof typeof priorityMap] || 99;
-                return pA - pB;
+                if (pA !== pB) return pA - pB;
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
             });
             setTasks(sorted as unknown as Task[]);
         }
@@ -48,6 +55,22 @@ export function Tasks() {
     useEffect(() => {
         fetchTasks();
     }, []);
+
+    const handleOpenNewTask = () => {
+        setTaskToEdit(undefined);
+        setIsModalOpen(true);
+    };
+
+    const handleEditTask = (task: Task) => {
+        setTaskToEdit(task);
+        setIsModalOpen(true);
+    };
+
+    const handleModalSuccess = () => {
+        fetchTasks();
+        setIsModalOpen(false); // TaskModal handles its own close, but we ensure state sync here or if onSuccess doesn't close it automatically (TaskModal does close itself, but we should update list).
+        // Actually TaskModal calls onSuccess then onClose.
+    };
 
     // Filters
     const filteredTasks = tasks.filter(task => {
@@ -63,7 +86,7 @@ export function Tasks() {
                 description="Organize e priorize o suporte aos clientes."
                 icon={CheckSquare}
                 action={
-                    <Button onClick={() => alert("Modal de Nova Tarefa será implementado na próxima etapa!")}>
+                    <Button onClick={handleOpenNewTask}>
                         <Plus size={16} className="mr-2" />
                         Nova Tarefa
                     </Button>
@@ -111,13 +134,20 @@ export function Tasks() {
                                 <TaskCard
                                     key={task.id}
                                     task={task}
-                                    onEdit={(t) => alert(`Editar tarefa do cliente: ${t.client?.name} (Modal em breve)`)}
+                                    onEdit={handleEditTask}
                                 />
                             ))
                         )}
                     </div>
                 )}
             </div>
+
+            <TaskModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={handleModalSuccess}
+                taskToEdit={taskToEdit}
+            />
         </PageContainer>
     );
 }
