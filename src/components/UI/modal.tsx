@@ -76,12 +76,13 @@ interface ModalHeaderProps {
     description?: string;
     onClose?: () => void;
     className?: string;
+    children?: React.ReactNode;
 }
 
-export function ModalHeader({ title, description, onClose, className }: ModalHeaderProps) {
+export function ModalHeader({ title, description, onClose, className, children }: ModalHeaderProps) {
     return (
         <div className={cn("flex items-start justify-between p-6 border-b border-border bg-muted/5 shrink-0", className)}>
-            <div className="space-y-1 pr-6">
+            <div className="space-y-1 pr-6 flex-1">
                 <h2 className="text-xl font-semibold tracking-tight leading-none text-foreground">
                     {title}
                 </h2>
@@ -91,17 +92,20 @@ export function ModalHeader({ title, description, onClose, className }: ModalHea
                     </p>
                 )}
             </div>
-            {onClose && (
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground -mr-2 -mt-2"
-                >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Fechar</span>
-                </Button>
-            )}
+            <div className="flex items-center gap-1 -mt-1 -mr-2">
+                {children}
+                {onClose && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onClose}
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    >
+                        <X className="h-4 w-4" />
+                        <span className="sr-only">Fechar</span>
+                    </Button>
+                )}
+            </div>
         </div>
     );
 }

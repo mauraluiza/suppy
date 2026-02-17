@@ -8,11 +8,16 @@ import { PageContainer } from '../components/Layout/Page/PageContainer';
 import { PageHeader } from '../components/Layout/Page/PageHeader';
 import { PageSearch } from '../components/Layout/Page/PageSearch';
 import { EmptyState } from '../components/ui/empty-state';
+import { NoteModal } from '../components/Notes/NoteModal';
 
 export function Notes() {
     const [notes, setNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [noteToEdit, setNoteToEdit] = useState<Note | undefined>(undefined);
 
     const fetchNotes = async () => {
         setLoading(true);
@@ -34,10 +39,36 @@ export function Notes() {
         fetchNotes();
     }, []);
 
+    const handleOpenNewNote = () => {
+        setNoteToEdit(undefined);
+        setIsModalOpen(true);
+    };
+
+    const handleEditNote = (note: Note) => {
+        setNoteToEdit(note);
+        setIsModalOpen(true);
+    };
+
+    const handleModalSuccess = () => {
+        fetchNotes();
+        setIsModalOpen(false);
+    };
+
     const handleToggleFavorite = async (note: Note) => {
-        // Otimistic update
+        // Optimistic update for immediate feedback
         const newStatus = !note.is_favorite;
-        setNotes(prev => prev.map(n => n.id === note.id ? { ...n, is_favorite: newStatus } : n));
+        setNotes(prev => {
+            const updated = prev.map(n => n.id === note.id ? { ...n, is_favorite: newStatus } : n);
+            // Re-sort logic: Favoritos (true) > Não Favoritos (false), then Date Desc
+            return updated.sort((a, b) => {
+                // If favorite status differs, favorite comes first (-1)
+                if (a.is_favorite !== b.is_favorite) {
+                    return a.is_favorite ? -1 : 1;
+                }
+                // If same status, sort by date desc
+                return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+            });
+        });
 
         const { error } = await supabase
             .from('notes')
@@ -47,21 +78,6 @@ export function Notes() {
         if (error) {
             console.error("Erro ao favoritar:", error);
             fetchNotes(); // Revert on error
-        } else {
-            // Re-fetch to guarantee sort order if needed, or just let it stay until reload
-            // Let's refetch to re-sort immediately? No, jarring. Keep current position until refresh or manual sort?
-            // User requested: "Organização: Favoritos primeiro". If I toggle, it should jump to top?
-            // Let's re-sort local state to reflect the requirement immediately.
-            setNotes(prev => {
-                const updated = prev.map(n => n.id === note.id ? { ...n, is_favorite: newStatus } : n);
-                // Re-sort logic: Favoritos (true) > Não Favoritos (false), then Date Desc
-                return updated.sort((a, b) => {
-                    if (a.is_favorite === b.is_favorite) {
-                        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-                    }
-                    return a.is_favorite ? -1 : 1;
-                });
-            });
         }
     };
 
@@ -92,7 +108,7 @@ export function Notes() {
                 description="Procedimentos, senhas padrão, links úteis e conhecimentos da equipe."
                 icon={StickyNote}
                 action={
-                    <Button onClick={() => alert("Modal de Edição Rich Text na próxima etapa!")}>
+                    <Button onClick={handleOpenNewNote}>
                         <Plus size={16} className="mr-2" />
                         Nova Informação
                     </Button>
@@ -135,7 +151,7 @@ export function Notes() {
                                 <NoteCard
                                     key={note.id}
                                     note={note}
-                                    onEdit={(n) => alert(`Editar nota: ${n.title} (Modal em breve)`)}
+                                    onEdit={handleEditNote}
                                     onDelete={handleDelete}
                                     onToggleFavorite={handleToggleFavorite}
                                 />
@@ -144,6 +160,13 @@ export function Notes() {
                     </div>
                 )}
             </div>
+
+            <NoteModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={handleModalSuccess}
+                noteToEdit={noteToEdit}
+            />
         </PageContainer>
     );
 }
