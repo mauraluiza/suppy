@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Lock, User, Building2, KeyRound } from 'lucide-react';
-import { supabase } from '../../services/supabaseClient';
+import { clientService } from '../../services/clientService';
 import { useAuth } from '../../context/AuthContext';
 import { useEncryption } from '../../hooks/useEncryption';
 import { ClientIntegrations } from './ClientIntegrations';
@@ -79,7 +79,6 @@ export function ClientModal({ isOpen, onClose, onSuccess, clientToEdit }: Client
                 status,
                 cnpj,
                 integrations,
-                updated_at: new Date().toISOString(),
             };
 
             if (system === 'cplug') {
@@ -95,16 +94,19 @@ export function ClientModal({ isOpen, onClose, onSuccess, clientToEdit }: Client
 
             let error;
             if (clientToEdit) {
-                const { error: updateError } = await supabase
-                    .from('clients')
-                    .update(payload)
-                    .eq('id', clientToEdit.id);
-                error = updateError;
+                // Update
+                try {
+                    await clientService.updateClient(clientToEdit.id, payload);
+                } catch (e) {
+                    error = e;
+                }
             } else {
-                const { error: insertError } = await supabase
-                    .from('clients')
-                    .insert([payload]);
-                error = insertError;
+                // Create
+                try {
+                    await clientService.createClient(payload);
+                } catch (e) {
+                    error = e;
+                }
             }
 
             if (error) throw error;

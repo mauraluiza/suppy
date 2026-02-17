@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { noteService } from '../services/noteService';
 import type { Note } from '../types';
 import { StickyNote, Plus } from 'lucide-react';
 import { NoteCard } from '../components/Notes/NoteCard';
@@ -21,18 +21,14 @@ export function Notes() {
 
     const fetchNotes = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('notes')
-            .select('*')
-            .order('is_favorite', { ascending: false }) // Favoritos primeiro
-            .order('updated_at', { ascending: false }); // Depois os mais recentes
-
-        if (error) {
+        try {
+            const data = await noteService.getNotes();
+            setNotes(data);
+        } catch (error) {
             console.error('Erro ao buscar notas:', error);
-        } else {
-            setNotes(data || []);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -70,12 +66,9 @@ export function Notes() {
             });
         });
 
-        const { error } = await supabase
-            .from('notes')
-            .update({ is_favorite: newStatus })
-            .eq('id', note.id);
-
-        if (error) {
+        try {
+            await noteService.updateNote(note.id, { is_favorite: newStatus });
+        } catch (error) {
             console.error("Erro ao favoritar:", error);
             fetchNotes(); // Revert on error
         }
@@ -84,11 +77,11 @@ export function Notes() {
     const handleDelete = async (id: string) => {
         if (!confirm("Tem certeza que deseja excluir esta anotação?")) return;
 
-        const { error } = await supabase.from('notes').delete().eq('id', id);
-        if (error) {
+        try {
+            await noteService.deleteNote(id);
+            fetchNotes();
+        } catch (error) {
             alert("Erro ao excluir nota.");
-        } else {
-            fetchNotes(); // Refresh list
         }
     };
 

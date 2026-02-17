@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { clientService } from '../services/clientService';
 import type { Client } from '../types';
 import { Plus, Edit, Trash2, Users } from 'lucide-react';
 import { ClientModal } from '../components/Clients/ClientModal';
@@ -20,17 +20,14 @@ export function Clients() {
 
     const fetchClients = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('clients')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
+        try {
+            const data = await clientService.getClients();
+            setClients(data);
+        } catch (error) {
             console.error('Erro ao buscar clientes:', error);
-        } else {
-            setClients(data || []);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -40,15 +37,12 @@ export function Clients() {
     const handleDelete = async (id: string) => {
         if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
 
-        const { error } = await supabase
-            .from('clients')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            alert('Erro ao excluir');
-        } else {
+        try {
+            await clientService.deleteClient(id);
             fetchClients();
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao excluir');
         }
     };
 

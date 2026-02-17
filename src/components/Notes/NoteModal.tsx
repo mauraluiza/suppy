@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Trash2, AlertCircle, Star } from 'lucide-react';
-import { supabase } from '../../services/supabaseClient';
+import { noteService } from '../../services/noteService';
 import { useAuth } from '../../context/AuthContext';
 import type { Note } from '../../types';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '../ui/modal';
@@ -58,27 +58,13 @@ export function NoteModal({ isOpen, onClose, onSuccess, noteToEdit }: NoteModalP
                 title,
                 content,
                 is_favorite: isFavorite,
-                updated_at: new Date().toISOString(),
             };
 
-            let error;
             if (noteToEdit) {
-                const { error: updateError } = await supabase
-                    .from('notes')
-                    .update(payload)
-                    .eq('id', noteToEdit.id);
-                error = updateError;
+                await noteService.updateNote(noteToEdit.id, payload);
             } else {
-                const { error: insertError } = await supabase
-                    .from('notes')
-                    .insert([{
-                        ...payload,
-                        created_at: new Date().toISOString()
-                    }]);
-                error = insertError;
+                await noteService.createNote(payload as any);
             }
-
-            if (error) throw error;
 
             onSuccess();
             onClose();
@@ -94,12 +80,7 @@ export function NoteModal({ isOpen, onClose, onSuccess, noteToEdit }: NoteModalP
         if (!noteToEdit) return;
         setLoading(true);
         try {
-            const { error } = await supabase
-                .from('notes')
-                .delete()
-                .eq('id', noteToEdit.id);
-
-            if (error) throw error;
+            await noteService.deleteNote(noteToEdit.id);
             onSuccess();
             onClose();
         } catch (error) {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../services/supabaseClient';
+import { taskService } from '../services/taskService';
 import type { Task } from '../types';
 import { CheckSquare, Plus } from 'lucide-react';
 import { TaskCard } from '../components/Tasks/TaskCard';
@@ -21,23 +21,9 @@ export function Tasks() {
 
     const fetchTasks = async () => {
         setLoading(true);
-        // We select *, and join 'client' table to get name and system.
-        // The type definition for Task interface should support this join or we map "any" temporarily.
-        const { data, error } = await supabase
-            .from('tasks')
-            .select(`
-                *,
-                client:clients (
-                    id,
-                    name,
-                    system
-                )
-            `)
-            .order('created_at', { ascending: false });
+        try {
+            const data = await taskService.getTasks();
 
-        if (error) {
-            console.error('Erro ao buscar tarefas:', error);
-        } else {
             // Sort frontend by priority: Urgent > In Progress > Pending > Done
             // But also consider date within same priority? For now just priority.
             const priorityMap = { urgent: 1, in_progress: 2, pending: 3, done: 4 };
@@ -48,8 +34,11 @@ export function Tasks() {
                 return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
             });
             setTasks(sorted as unknown as Task[]);
+        } catch (error) {
+            console.error('Erro ao buscar tarefas:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {

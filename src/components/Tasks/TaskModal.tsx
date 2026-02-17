@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Trash2, AlertCircle } from 'lucide-react';
-import { supabase } from '../../services/supabaseClient';
+import { taskService } from '../../services/taskService';
+import { clientService } from '../../services/clientService';
 import { useAuth } from '../../context/AuthContext';
 import type { Task } from '../../types';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '../ui/modal';
@@ -33,15 +34,14 @@ export function TaskModal({ isOpen, onClose, onSuccess, taskToEdit }: TaskModalP
         if (isOpen) {
             const fetchClients = async () => {
                 setClientsLoading(true);
-                const { data, error } = await supabase
-                    .from('clients')
-                    .select('id, name')
-                    .order('name');
-
-                if (!error && data) {
-                    setClients(data);
+                try {
+                    const data = await clientService.getClients();
+                    setClients(data.map(c => ({ id: c.id, name: c.name })));
+                } catch (error) {
+                    console.error("Erro ao carregar clientes", error);
+                } finally {
+                    setClientsLoading(false);
                 }
-                setClientsLoading(false);
             };
             fetchClients();
         }
@@ -78,27 +78,13 @@ export function TaskModal({ isOpen, onClose, onSuccess, taskToEdit }: TaskModalP
                 client_id: clientId,
                 status,
                 description,
-                updated_at: new Date().toISOString(),
             };
 
-            let error;
             if (taskToEdit) {
-                const { error: updateError } = await supabase
-                    .from('tasks')
-                    .update(payload)
-                    .eq('id', taskToEdit.id);
-                error = updateError;
+                await taskService.updateTask(taskToEdit.id, payload);
             } else {
-                const { error: insertError } = await supabase
-                    .from('tasks')
-                    .insert([{
-                        ...payload,
-                        created_at: new Date().toISOString() // Explicit creation date
-                    }]);
-                error = insertError;
+                await taskService.createTask(payload as any);
             }
-
-            if (error) throw error;
 
             onSuccess();
             onClose();
@@ -114,12 +100,7 @@ export function TaskModal({ isOpen, onClose, onSuccess, taskToEdit }: TaskModalP
         if (!taskToEdit) return;
         setLoading(true);
         try {
-            const { error } = await supabase
-                .from('tasks')
-                .delete()
-                .eq('id', taskToEdit.id);
-
-            if (error) throw error;
+            await taskService.deleteTask(taskToEdit.id);
             onSuccess();
             onClose();
         } catch (error) {
