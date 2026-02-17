@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Users, Clock, Star, ArrowRight } from 'lucide-react';
+import { Users, Clock, Star } from 'lucide-react';
 import { clientService } from '../services/clientService';
 import { taskService } from '../services/taskService';
 import { noteService } from '../services/noteService';
+import { DashboardSectionHeader } from '../components/Dashboard/DashboardSectionHeader';
 import clsx from 'clsx';
 import type { Client, Task, Note } from '../types';
 
@@ -49,13 +50,11 @@ export function Dashboard() {
 
             {/* SEÇÃO 1: CLIENTES RECENTES */}
             <section className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-foreground flex items-center gap-2 tracking-tight">
-                        <Users size={20} className="text-primary" />
-                        Clientes Recentes
-                    </h2>
-                    <button className="text-sm font-medium text-primary hover:text-primary-dark transition-colors">Ver todos</button>
-                </div>
+                <DashboardSectionHeader
+                    title="Clientes Recentes"
+                    icon={<Users size={20} className="text-primary" />}
+                    navigateTo="/clients"
+                />
 
                 <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
@@ -113,15 +112,11 @@ export function Dashboard() {
 
             {/* SEÇÃO 2: TAREFAS */}
             <section className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-foreground flex items-center gap-2 tracking-tight">
-                        <Clock size={20} className="text-orange-500" />
-                        Tarefas Recentes
-                    </h2>
-                    <div className="flex gap-2">
-                        <button className="p-1 hover:bg-muted rounded text-muted-foreground transition-colors"><ArrowRight size={16} /></button>
-                    </div>
-                </div>
+                <DashboardSectionHeader
+                    title="Tarefas Recentes"
+                    icon={<Clock size={20} className="text-orange-500" />}
+                    navigateTo="/tasks"
+                />
 
                 {/* Horizontal Scroll Container */}
                 <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
@@ -155,12 +150,11 @@ export function Dashboard() {
 
             {/* SEÇÃO 3: INFO GERAIS */}
             <section className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-foreground flex items-center gap-2 tracking-tight">
-                        <Star size={20} className="text-yellow-500" />
-                        Informações Rápidas
-                    </h2>
-                </div>
+                <DashboardSectionHeader
+                    title="Informações Rápidas"
+                    icon={<Star size={20} className="text-yellow-500" />}
+                    navigateTo="/notes"
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {notes.length === 0 ? (
