@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Users, Clock, Star } from 'lucide-react';
 import { clientService, taskService, noteService } from '../../services/supabase';
 import { DashboardSectionHeader } from '../../components/shared/DashboardSectionHeader';
+import { TaskCard } from '../../components/shared/TaskCard';
+import { NoteCard } from '../../components/shared/NoteCard';
 import clsx from 'clsx';
 import type { Client, Task, Note } from '../../types';
 
@@ -80,7 +82,7 @@ export function Dashboard() {
                                             <tr
                                                 key={client.id}
                                                 className={clsx(
-                                                    "transition-colors hover:bg-muted/50 cursor-pointer",
+                                                    "",
                                                     isCplug ? "dark:bg-blue-950/10" : "dark:bg-red-950/10"
                                                 )}
                                             >
@@ -124,22 +126,8 @@ export function Dashboard() {
                         </div>
                     ) : (
                         tasks.map((task) => (
-                            <div
-                                key={task.id}
-                                className="snap-start min-w-[280px] md:min-w-[320px] bg-card p-5 rounded-lg border border-border shadow-sm flex flex-col gap-3 hover:border-primary/50 transition-all cursor-pointer group"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <span className="text-sm font-medium text-muted-foreground truncate max-w-[180px]">
-                                        {task.client?.name}
-                                    </span>
-                                    <StatusBadge status={task.status} />
-                                </div>
-                                <div className="text-card-foreground font-medium line-clamp-2 mt-1 leading-snug prose prose-sm dark:prose-invert" dangerouslySetInnerHTML={{ __html: task.description }} />
-
-                                <div className="mt-auto pt-3 text-xs text-muted-foreground flex justify-between items-center border-t border-border">
-                                    <span>{new Date(task.created_at).toLocaleDateString()}</span>
-                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-primary font-medium">Ver detalhes →</span>
-                                </div>
+                            <div key={task.id} className="snap-start min-w-[280px] md:min-w-[320px] max-w-[320px] flex-shrink-0">
+                                <TaskCard task={task} interactive={false} />
                             </div>
                         ))
                     )}
@@ -161,15 +149,8 @@ export function Dashboard() {
                         </div>
                     ) : (
                         notes.map((note) => (
-                            <div
-                                key={note.id}
-                                className="bg-card p-5 rounded-lg border border-border hover:bg-muted/50 transition-all cursor-pointer shadow-sm group"
-                            >
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-card-foreground font-semibold tracking-tight">{note.title}</h3>
-                                    {note.is_favorite && <Star size={16} className="text-yellow-500 fill-yellow-500" />}
-                                </div>
-                                <div className="text-sm text-muted-foreground line-clamp-3 leading-relaxed prose prose-sm dark:prose-invert" dangerouslySetInnerHTML={{ __html: note.content }} />
+                            <div key={note.id} className="h-full">
+                                <NoteCard note={note} interactive={false} />
                             </div>
                         ))
                     )}
@@ -177,30 +158,5 @@ export function Dashboard() {
             </section>
 
         </div>
-    );
-}
-
-// Helper para Badge colorido
-function StatusBadge({ status }: { status?: string }) {
-    const styles = {
-        urgent: "bg-red-500/10 text-red-500",
-        in_progress: "bg-orange-500/10 text-orange-500",
-        pending: "bg-yellow-500/10 text-yellow-500",
-        done: "bg-green-500/10 text-green-500",
-    };
-
-    const labels = {
-        urgent: "Urgente",
-        in_progress: "Em Andamento",
-        pending: "Pendente",
-        done: "Concluído",
-    };
-
-    const key = status as keyof typeof styles;
-
-    return (
-        <span className={clsx("px-2 py-0.5 rounded-full text-xs font-medium border border-transparent", styles[key])}>
-            {labels[key]}
-        </span>
     );
 }

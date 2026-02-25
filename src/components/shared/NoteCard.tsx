@@ -11,9 +11,10 @@ interface NoteCardProps {
     onEdit?: (note: Note) => void;
     onDelete?: (noteId: string) => void;
     onToggleFavorite?: (note: Note) => void;
+    interactive?: boolean;
 }
 
-export function NoteCard({ note, onEdit, onDelete, onToggleFavorite }: NoteCardProps) {
+export function NoteCard({ note, onEdit, onDelete, onToggleFavorite, interactive = true }: NoteCardProps) {
 
     // Função para limpar HTML do Rich Text e resumir
     const plainContent = note.content.replace(/<[^>]+>/g, ' ');
@@ -22,7 +23,10 @@ export function NoteCard({ note, onEdit, onDelete, onToggleFavorite }: NoteCardP
         : plainContent;
 
     return (
-        <Card className="group hover:shadow-md transition-all cursor-pointer relative overflow-hidden bg-card border-border flex flex-col h-full">
+        <Card className={cn(
+            "relative overflow-hidden bg-card border-border flex flex-col h-full min-h-[140px]",
+            interactive ? "group hover:shadow-md transition-all cursor-pointer" : "cursor-default"
+        )}>
             {/* Faixa lateral colorida se for favorito */}
             {note.is_favorite && (
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-400 z-10" />
@@ -33,21 +37,25 @@ export function NoteCard({ note, onEdit, onDelete, onToggleFavorite }: NoteCardP
                     <CardTitle className="text-lg font-bold leading-tight text-foreground line-clamp-2">
                         {note.title}
                     </CardTitle>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onToggleFavorite?.(note);
-                        }}
-                        className="text-muted-foreground hover:text-yellow-500 transition-colors focus:outline-none"
-                    >
-                        <Star
-                            size={18}
-                            className={cn(
-                                "transition-all",
-                                note.is_favorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/50 hover:text-yellow-400"
-                            )}
-                        />
-                    </button>
+                    {interactive ? (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleFavorite?.(note);
+                            }}
+                            className="text-muted-foreground hover:text-yellow-500 transition-colors focus:outline-none"
+                        >
+                            <Star
+                                size={18}
+                                className={cn(
+                                    "transition-all",
+                                    note.is_favorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/50 hover:text-yellow-400"
+                                )}
+                            />
+                        </button>
+                    ) : (
+                        note.is_favorite && <Star size={18} className="fill-yellow-400 text-yellow-400" />
+                    )}
                 </div>
                 <span className="text-xs text-muted-foreground block mt-1">
                     Atualizado {formatDistanceToNow(new Date(note.updated_at || note.created_at), { addSuffix: true, locale: ptBR })}
@@ -60,32 +68,34 @@ export function NoteCard({ note, onEdit, onDelete, onToggleFavorite }: NoteCardP
                 </p>
             </CardContent>
 
-            <CardFooter className="pt-2 pb-4 px-6 border-t border-border/50 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-primary"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit?.(note);
-                    }}
-                    title="Editar"
-                >
-                    <Edit size={16} />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete?.(note.id);
-                    }}
-                    title="Excluir"
-                >
-                    <Trash2 size={16} />
-                </Button>
-            </CardFooter>
+            {interactive && (
+                <CardFooter className="pt-2 pb-4 px-6 border-t border-border/50 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity mt-auto">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-primary"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit?.(note);
+                        }}
+                        title="Editar"
+                    >
+                        <Edit size={16} />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete?.(note.id);
+                        }}
+                        title="Excluir"
+                    >
+                        <Trash2 size={16} />
+                    </Button>
+                </CardFooter>
+            )}
         </Card>
     );
 }

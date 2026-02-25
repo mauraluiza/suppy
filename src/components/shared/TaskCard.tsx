@@ -9,6 +9,7 @@ interface TaskCardProps {
     task: Task;
     onEdit?: (task: Task) => void;
     onDelete?: (taskId: string) => void;
+    interactive?: boolean;
 }
 
 const statusMap = {
@@ -34,7 +35,7 @@ const statusMap = {
     },
 };
 
-export function TaskCard({ task, onEdit }: TaskCardProps) {
+export function TaskCard({ task, onEdit, interactive = true }: TaskCardProps) {
     const config = statusMap[task.status] || statusMap.pending;
     const StatusIcon = config.icon;
     const clientName = task.client?.name || "Cliente Desconhecido"; // Fallback if client relation is missing
@@ -45,9 +46,12 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
 
     return (
         <Card
-            className="group hover:shadow-md transition-all cursor-pointer border-l-4 overflow-hidden relative"
+            className={cn(
+                "border-l-4 overflow-hidden relative min-h-[140px] flex flex-col",
+                interactive ? "group hover:shadow-md transition-all cursor-pointer" : "cursor-default"
+            )}
             style={{ borderLeftColor: `var(--color-${task.status === 'urgent' ? 'red' : task.status === 'in_progress' ? 'orange' : task.status === 'done' ? 'green' : 'yellow'}-500)` }}
-            onClick={() => onEdit?.(task)}
+            onClick={() => interactive && onEdit?.(task)}
         >
             <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
@@ -63,14 +67,16 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
                     {clientName}
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-grow">
                 <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px]">
                     {plainDescription || "Sem descrição..."}
                 </p>
             </CardContent>
-            <CardFooter className="pt-0 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-xs text-primary font-medium">Clique para editar</span>
-            </CardFooter>
+            {interactive && (
+                <CardFooter className="pt-0 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity mt-auto">
+                    <span className="text-xs text-primary font-medium">Clique para editar</span>
+                </CardFooter>
+            )}
         </Card>
     );
 }
