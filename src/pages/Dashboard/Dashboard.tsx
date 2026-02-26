@@ -4,14 +4,19 @@ import { clientService, taskService, noteService } from '../../services/supabase
 import { DashboardSectionHeader } from '../../components/shared/DashboardSectionHeader';
 import { TaskCard } from '../../components/shared/TaskCard';
 import { NoteCard } from '../../components/shared/NoteCard';
+import { Button } from '../../components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import type { Client, Task, Note } from '../../types';
 
 export function Dashboard() {
+    const navigate = useNavigate();
     const [clients, setClients] = useState<Client[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [notes, setNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isHoveringTable, setIsHoveringTable] = useState(false);
+    const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -37,6 +42,16 @@ export function Dashboard() {
         fetchDashboardData();
     }, []);
 
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+        // Consider scrolled to bottom if within 5px of the end
+        if (Math.ceil(scrollTop + clientHeight) >= scrollHeight - 5) {
+            setIsScrolledToBottom(true);
+        } else {
+            setIsScrolledToBottom(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -46,7 +61,7 @@ export function Dashboard() {
     }
 
     return (
-        <div className="space-y-8 pb-20">
+        <div className="space-y-8">
 
             {/* SEÇÃO 1: CLIENTES RECENTES */}
             <section className="space-y-4">
@@ -56,10 +71,18 @@ export function Dashboard() {
                     navigateTo="/clients"
                 />
 
-                <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
+                <div
+                    className="rounded-lg border border-border bg-card text-card-foreground shadow-sm flex flex-col relative"
+                    onMouseEnter={() => setIsHoveringTable(true)}
+                    onMouseLeave={() => setIsHoveringTable(false)}
+                >
+                    {/* Shadow scroll indicator if scrollable */}
+                    <div
+                        className="overflow-x-auto overflow-y-auto max-h-[220px] relative border-b border-border/50"
+                        onScroll={handleScroll}
+                    >
                         <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
+                            <thead className="text-xs text-muted-foreground uppercase bg-muted/95 border-b border-border sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-muted/80">
                                 <tr>
                                     <th className="px-6 py-3 font-medium">Sistema</th>
                                     <th className="px-6 py-3 font-medium">Nome</th>
@@ -107,6 +130,29 @@ export function Dashboard() {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Gradient Overlay for Scroll Indication */}
+                    {clients.length > 3 && (
+                        <div
+                            className={clsx(
+                                "absolute bottom-12 left-0 w-full h-16 pointer-events-none transition-opacity duration-300 bg-gradient-to-t from-card to-transparent",
+                                (isHoveringTable || isScrolledToBottom) ? "opacity-0" : "opacity-100"
+                            )}
+                        />
+                    )}
+
+                    {clients.length > 0 && (
+                        <div className="bg-muted/30 p-2 flex justify-center">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => navigate('/clients')}
+                                className="w-full text-xs text-muted-foreground hover:text-primary transition-colors h-8"
+                            >
+                                Ver todos os clientes
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </section>
 
