@@ -77,7 +77,7 @@ export function Dashboard() {
                     onMouseLeave={() => setIsHoveringTable(false)}
                 >
                     <div
-                        className="overflow-x-auto overflow-y-auto max-h-[180px] relative border-b border-border/50"
+                        className="overflow-x-auto overflow-y-auto max-h-[170px] relative border-b border-border/50"
                         onScroll={handleScroll}
                     >
                         <table className="w-full text-sm text-left">

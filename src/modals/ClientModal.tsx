@@ -22,7 +22,7 @@ export function ClientModal({ isOpen, onClose, onSuccess, clientToEdit }: Client
 
     // Form States
     const [name, setName] = useState('');
-    const [system, setSystem] = useState<'winfood' | 'cplug'>('winfood');
+    const [system, setSystem] = useState<'winfood' | 'cplug'>('cplug');
     const [status, setStatus] = useState<'implantation' | 'active' | 'inactive'>('implantation');
 
     // Conditional Fields
@@ -53,17 +53,33 @@ export function ClientModal({ isOpen, onClose, onSuccess, clientToEdit }: Client
 
             } else {
                 setName('');
-                setSystem('winfood');
+                setSystem('cplug');
                 setStatus('implantation');
                 setLoginCode('');
-                setSystemLogin('');
+                setSystemLogin('Supervisor');
                 setOperator('');
-                setPassword('');
+                setPassword('121412');
                 setCnpj('');
                 setIntegrations([]);
             }
         }
     }, [isOpen, clientToEdit]);
+
+    const handleSystemChange = (newSystem: 'winfood' | 'cplug') => {
+        if (!clientToEdit) {
+            // Smart defaults mapping only on create mode for empty/default fields
+            if (newSystem === 'winfood') {
+                if (!operator || operator === 'Supervisor') setOperator('1');
+                if (!password || password === '121412') setPassword('121012');
+                if (systemLogin === 'Supervisor') setSystemLogin('');
+            } else if (newSystem === 'cplug') {
+                if (!systemLogin || systemLogin === '1') setSystemLogin('Supervisor');
+                if (!password || password === '121012') setPassword('121412');
+                if (operator === '1') setOperator('');
+            }
+        }
+        setSystem(newSystem);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -139,7 +155,7 @@ export function ClientModal({ isOpen, onClose, onSuccess, clientToEdit }: Client
                     <div className="grid grid-cols-2 gap-2 mb-4">
                         <button
                             type="button"
-                            onClick={() => setSystem('winfood')}
+                            onClick={() => handleSystemChange('winfood')}
                             className={`p-2 text-sm font-medium rounded-md border transition-colors ${system === 'winfood'
                                 ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
                                 : 'border-border text-muted-foreground hover:bg-muted dark:hover:bg-gray-800'
@@ -149,13 +165,13 @@ export function ClientModal({ isOpen, onClose, onSuccess, clientToEdit }: Client
                         </button>
                         <button
                             type="button"
-                            onClick={() => setSystem('cplug')}
+                            onClick={() => handleSystemChange('cplug')}
                             className={`p-2 text-sm font-medium rounded-md border transition-colors ${system === 'cplug'
                                 ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
                                 : 'border-border text-muted-foreground hover:bg-muted dark:hover:bg-gray-800'
                                 }`}
                         >
-                            Cplug
+                            CPlug
                         </button>
                     </div>
 
