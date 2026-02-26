@@ -22,7 +22,7 @@ export function NoteCard({ note, onEdit, onDelete, onToggleFavorite, interactive
 
     return (
         <Card className={cn(
-            "relative overflow-hidden bg-card border-border flex flex-col h-full min-h-[140px]",
+            "relative overflow-hidden bg-card border-border flex flex-col h-full min-h-[120px]",
             interactive ? "group hover:shadow-md transition-all cursor-pointer" : "cursor-default"
         )}>
             {/* Faixa lateral colorida se for favorito */}
@@ -32,7 +32,7 @@ export function NoteCard({ note, onEdit, onDelete, onToggleFavorite, interactive
 
             <CardHeader className="pb-2 space-y-0">
                 <div className="flex justify-between items-start gap-2">
-                    <CardTitle className="text-lg font-bold leading-tight text-foreground line-clamp-2 break-words">
+                    <CardTitle className="text-base font-semibold leading-tight text-foreground line-clamp-2 break-words">
                         {note.title}
                     </CardTitle>
                     <div className="flex items-center gap-2 shrink-0 mt-0.5">

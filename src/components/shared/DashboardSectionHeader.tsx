@@ -12,7 +12,7 @@ export function DashboardSectionHeader({ title, icon, navigateTo }: DashboardSec
 
     return (
         <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2 tracking-tight">
+            <h2 className="text-lg font-medium text-foreground flex items-center gap-2 tracking-tight">
                 {icon}
                 {title}
             </h2>

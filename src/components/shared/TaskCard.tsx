@@ -45,7 +45,7 @@ export function TaskCard({ task, onEdit, interactive = true }: TaskCardProps) {
     return (
         <Card
             className={cn(
-                "border-l-4 overflow-hidden relative min-h-[140px] flex flex-col",
+                "border-l-4 overflow-hidden relative min-h-[120px] flex flex-col",
                 interactive ? "group hover:shadow-md transition-all cursor-pointer" : "cursor-default"
             )}
             style={{ borderLeftColor: `var(--color-${task.status === 'urgent' ? 'red' : task.status === 'in_progress' ? 'orange' : task.status === 'done' ? 'green' : 'yellow'}-500)` }}
@@ -61,7 +61,7 @@ export function TaskCard({ task, onEdit, interactive = true }: TaskCardProps) {
                         {formatRelativeTime(task.created_at)}
                     </span>
                 </div>
-                <CardTitle className="text-lg font-bold leading-tight mt-2 text-foreground break-words line-clamp-1">
+                <CardTitle className="text-base font-semibold leading-tight mt-2 text-foreground break-words line-clamp-1">
                     {clientName}
                 </CardTitle>
             </CardHeader>

@@ -61,13 +61,13 @@ export function Dashboard() {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6 lg:h-full lg:overflow-y-hidden">
 
             {/* SEÇÃO 1: CLIENTES RECENTES */}
-            <section className="space-y-4">
+            <section className="space-y-3">
                 <DashboardSectionHeader
                     title="Clientes Recentes"
-                    icon={<Users size={20} className="text-primary" />}
+                    icon={<Users size={18} className="text-primary" />}
                     navigateTo="/clients"
                 />
 
@@ -76,25 +76,24 @@ export function Dashboard() {
                     onMouseEnter={() => setIsHoveringTable(true)}
                     onMouseLeave={() => setIsHoveringTable(false)}
                 >
-                    {/* Shadow scroll indicator if scrollable */}
                     <div
-                        className="overflow-x-auto overflow-y-auto max-h-[220px] relative border-b border-border/50"
+                        className="overflow-x-auto overflow-y-auto max-h-[180px] relative border-b border-border/50"
                         onScroll={handleScroll}
                     >
                         <table className="w-full text-sm text-left">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/95 border-b border-border sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-muted/80">
                                 <tr>
-                                    <th className="px-6 py-3 font-medium">Sistema</th>
-                                    <th className="px-6 py-3 font-medium">Nome</th>
-                                    <th className="px-6 py-3 font-medium">Login Code</th>
-                                    <th className="px-6 py-3 font-medium">Usuário</th>
-                                    <th className="px-6 py-3 font-medium">Senha</th>
+                                    <th className="px-4 py-2 font-medium">Sistema</th>
+                                    <th className="px-4 py-2 font-medium">Nome</th>
+                                    <th className="px-4 py-2 font-medium">Login Code</th>
+                                    <th className="px-4 py-2 font-medium">Usuário</th>
+                                    <th className="px-4 py-2 font-medium">Senha</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
                                 {clients.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="px-6 py-4 text-center text-muted-foreground">
+                                        <td colSpan={5} className="px-4 py-3 text-center text-muted-foreground">
                                             Nenhum cliente cadastrado.
                                         </td>
                                     </tr>
@@ -109,9 +108,9 @@ export function Dashboard() {
                                                     isCplug ? "dark:bg-blue-950/10" : "dark:bg-red-950/10"
                                                 )}
                                             >
-                                                <td className="px-6 py-4">
+                                                <td className="px-4 py-3">
                                                     <span className={clsx(
-                                                        "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset",
+                                                        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset",
                                                         isCplug
                                                             ? "bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/30"
                                                             : "bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-400/30"
@@ -119,10 +118,10 @@ export function Dashboard() {
                                                         {client.system?.toUpperCase()}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 font-medium text-foreground">{client.name}</td>
-                                                <td className="px-6 py-4 text-muted-foreground">{client.login_code || '-'}</td>
-                                                <td className="px-6 py-4 text-muted-foreground">{client.system_login}</td>
-                                                <td className="px-6 py-4 font-mono text-muted-foreground">******</td>
+                                                <td className="px-4 py-3 font-medium text-foreground">{client.name}</td>
+                                                <td className="px-4 py-3 text-muted-foreground">{client.login_code || '-'}</td>
+                                                <td className="px-4 py-3 text-muted-foreground">{client.system_login}</td>
+                                                <td className="px-4 py-3 font-mono text-muted-foreground">******</td>
                                             </tr>
                                         );
                                     })
@@ -157,17 +156,17 @@ export function Dashboard() {
             </section>
 
             {/* SEÇÃO 2: TAREFAS */}
-            <section className="space-y-4">
+            <section className="space-y-3">
                 <DashboardSectionHeader
                     title="Tarefas Recentes"
-                    icon={<Clock size={20} className="text-orange-500" />}
+                    icon={<Clock size={18} className="text-orange-500" />}
                     navigateTo="/tasks"
                 />
 
                 {/* Horizontal Scroll Container */}
-                <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+                <div className="flex gap-4 overflow-x-auto pb-2 snap-x">
                     {tasks.length === 0 ? (
-                        <div className="w-full text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
+                        <div className="w-full text-center py-4 text-muted-foreground border border-dashed border-border rounded-lg">
                             Nenhuma tarefa pendente.
                         </div>
                     ) : (
@@ -181,16 +180,16 @@ export function Dashboard() {
             </section>
 
             {/* SEÇÃO 3: NOTAS RÁPIDAS */}
-            <section className="space-y-4">
+            <section className="space-y-3">
                 <DashboardSectionHeader
                     title="Notas Rápidas"
-                    icon={<Star size={20} className="text-yellow-500" />}
+                    icon={<Star size={18} className="text-yellow-500" />}
                     navigateTo="/notes"
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {notes.length === 0 ? (
-                        <div className="col-span-full text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
+                        <div className="col-span-full text-center py-4 text-muted-foreground border border-dashed border-border rounded-lg">
                             Nenhuma nota cadastrada.
                         </div>
                     ) : (
